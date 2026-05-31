@@ -1,0 +1,47 @@
+version: '3.8'
+
+services: 
+
+  vote:
+    build: ./vote
+    ports: 
+      - "5000:3000"
+    depends_on:
+      - redis
+    networks: 
+      - votex-network
+
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+      - mysql
+    networks:
+      - votex-network
+
+
+  result:
+    build: ./result
+    ports:
+      - "5001:3000"
+    depends_on:
+      - mysql
+    networks:
+      - votex-network
+
+  redis:
+    image: redis:alpine
+    networks:
+      - votex-network
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: votex
+    networks:
+      - votex-network
+
+networks:
+  votex-network:
+    driver: bridge
